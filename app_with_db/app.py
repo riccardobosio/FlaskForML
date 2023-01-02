@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template
+from flask import Flask, flash, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 
@@ -43,7 +43,8 @@ def register():
         user = User(email=form.email.data, password=hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash('Your account has been created, you can now login')
+        flash(f'Your account has been created with email {form.email.data}, you can now login', 'success')
+        return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
