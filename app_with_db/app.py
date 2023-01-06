@@ -1,6 +1,7 @@
 from flask import Flask, flash, render_template, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user
 
 
 app = Flask(__name__)
@@ -11,13 +12,19 @@ db = SQLAlchemy(app)
 
 bcrypt = Bcrypt(app)
 
-class User(db.Model):
+login_manager = LoginManager(app)
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(50))
 
     def __repr__(self):
         return f"User({self.id}, {self.email})"
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -37,6 +44,9 @@ from forms import RegistrationForm, LoginForm
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+    if current_user.is_authenticated:
+        flash("You are already logged in.")
+        return redirect(url_for('home'))
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
@@ -49,9 +59,17 @@ def register():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        flash("You are already logged in.")
+        return redirect(url_for('home'))
     form = LoginForm()
     if form.validate_on_submit():
-        pass
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            login_user(user, remember=form.remember.data)
+            return redirect(url_for('home'))
+        else:
+            flash('Login unsuccessful. Please check your email and pw', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 @app.route("/predictions", methods=['GET'])
@@ -66,3 +84,9 @@ def make_prediction():
 @app.route('/home')
 def home():
     return render_template('home.html')
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    flash("You logged out.")
+    return redirect(url_for('home'))
