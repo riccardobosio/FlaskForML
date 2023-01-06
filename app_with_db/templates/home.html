@@ -7,3 +7,9 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
+
+Home page
+
+{% if current_user.is_authenticated%} 
+{% else %}
+{% endif%} 
