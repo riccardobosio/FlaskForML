@@ -2,6 +2,7 @@ from flask import Flask, flash, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, current_user, logout_user, login_required
+from flask_migrate import Migrate
 
 
 app = Flask(__name__)
@@ -9,6 +10,7 @@ app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 bcrypt = Bcrypt(app)
 
@@ -20,6 +22,7 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(20), unique=True, nullable=False)
     password = db.Column(db.String(50))
+    image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
 
     def __repr__(self):
         return f"User({self.id}, {self.email})"
@@ -97,4 +100,5 @@ def logout():
 @app.route('/account')
 @login_required
 def account():
-    return render_template('account.html', title='Account')
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title='Account', image_file=image_file)

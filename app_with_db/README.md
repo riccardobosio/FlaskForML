@@ -1,3 +1,15 @@
+## INSTALL REQUIREMENTS
+
+Use the following command to create a virtual environment:
+```console
+python3 -m venv .venv
+```
+
+Activate the virtual environment and then run:
+```console
+pip install -r requirements.txt
+```
+
 ## HOW TO MANAGE THE DB
 
 
@@ -42,4 +54,24 @@ You will see the new record only after committing.
 From flask shell run:
 ```console
 db.drop_all()
+```
+
+### TO MIGRATE
+
+Add the migrations folder to the application
+
+```console
+flask db init
+```
+
+Generate a migration:
+
+```console
+flask db migrate -m "Initial migration."
+```
+
+Apply changes:
+
+```console
+flask db upgrade
 ```
