@@ -5,3 +5,5 @@ app/__pycache__/app.cpython-37.pyc
 .venv/
 app_with_db/migrations/versions/__pycache__/b8e88f833721_initial_migration.cpython-39.pyc
 __pycache__/
+app_with_db/static/profile_pics/
+app_with_db/instance/
