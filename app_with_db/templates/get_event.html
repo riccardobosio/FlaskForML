@@ -12,13 +12,12 @@
 <br>
 
 {% if current_user.is_authenticated%} 
-    {% for prediction in predictions %}
-        <div> Event id: {{ prediction.event_id }} </div>
-        <div> Prediction: {{ prediction.result }} </div>
-        <div> User id: {{ prediction.user_id }} </div>
-
-        <div></div>
+    {% for event in events %}
+        <div> Event id: {{ event.id }} </div>
+        <div> Home: {{ event.home }} </div>
+        <div> Away: {{ event.away }} </div>
+        <br>
     {% endfor %}
 {% else %}
-<div>Login to see predictions.</div>
-{% endif%} 
+<div>Login to see events.</div>
+{% endif%}

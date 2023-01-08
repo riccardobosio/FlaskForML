@@ -48,7 +48,8 @@ class Prediction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
-from forms import RegistrationForm, LoginForm, UpdateAccountForm
+# IMPORT FORMS
+from forms import RegistrationForm, LoginForm, UpdateAccountForm, PredictionForm, EventForm
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -81,18 +82,11 @@ def login():
             flash('Login unsuccessful. Please check your email and pw', 'danger')
     return render_template('login.html', title='Login', form=form)
 
-@app.route("/predictions", methods=['GET'])
-def get_predictions():
-    pass
-
-@app.route("/predict", methods=['GET', 'POST'])
-def make_prediction():
-    pass
-
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    predictions = Prediction.query.all()
+    return render_template('home.html', predictions=predictions)
 
 @app.route('/logout')
 def logout():
@@ -128,3 +122,33 @@ def account():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     return render_template('account.html', title='Account', image_file=image_file, form=form)
+
+@app.route('/event/new', methods = ['GET', 'POST'])
+@login_required
+def new_event():
+    form = EventForm()
+    if form.validate_on_submit():
+        event = Event(home=form.home.data, away=form.away.data)
+        db.session.add(event)
+        db.session.commit()
+        flash('The event has been created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_event.html', title='New event', form=form)
+
+@app.route('/prediction/new', methods=['GET', 'POST'])
+@login_required
+def new_prediction():
+    form = PredictionForm()
+    if form.validate_on_submit():
+        prediction = Prediction(result=form.result.data, event_id=form.event_id.data, user_id=current_user.id)
+        db.session.add(prediction)
+        db.session.commit()
+        flash('Your prediction has been created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_prediction.html', title='New prediction', form=form)
+
+@app.route('/event', methods=['GET'])
+@login_required
+def get_event():
+    events = Event.query.all()
+    return render_template('get_event.html', title='Events list', events=events)

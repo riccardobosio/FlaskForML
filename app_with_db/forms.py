@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms.validators import DataRequired, Email, EqualTo, ValidationError, Length
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField
 from app import User
 from flask_login import current_user
 
@@ -33,3 +33,13 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('That email is taken. Please choose a different one.')
+
+class PredictionForm(FlaskForm):
+    event_id = IntegerField('Event', validators=[DataRequired()])
+    result = IntegerField('Result', validators=[DataRequired()])#Length(min=1, max=1, message='Prediction should be 0 (draw), 1 (home wins), 2 (away wins)')
+    submit = SubmitField('Predict')
+
+class EventForm(FlaskForm):
+    home = StringField('Home', validators=[DataRequired()])
+    away = StringField('Away', validators=[DataRequired()])
+    submit = SubmitField('Create event')
