@@ -152,3 +152,9 @@ def new_prediction():
 def get_event():
     events = Event.query.all()
     return render_template('get_event.html', title='Events list', events=events)
+
+@app.route('/prediction', methods=['GET'])
+@login_required
+def get_prediction():
+    predictions = Prediction.query.filter_by(user_id=current_user.id).all()
+    return render_template('get_prediction.html', title='Your prediction list', predictions=predictions)    

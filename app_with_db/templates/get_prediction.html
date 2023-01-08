@@ -1,0 +1,24 @@
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+{% for category, message in messages %}
+<div class="alert-alert-{{ category }}">
+    {{ message }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<div>Your prediction list</div>
+<br>
+
+{% if current_user.is_authenticated%} 
+    {% for prediction in predictions %}
+        <div> Event id: {{ prediction.event_id }} </div>
+        <div> Prediction: {{ prediction.result }} </div>
+        <div> User id: {{ prediction.user_id }} </div>
+
+        <div></div>
+    {% endfor %}
+{% else %}
+<div>Login to see predictions.</div>
+{% endif%} 
